@@ -47,3 +47,14 @@ git config --global core.excludesfile $FOR_GIT/my_gitignore_global
 #    (B) This version uses files defined in the community GitHub-repo
 URL_GITIGNORES=https://github.com/github/gitignore.git
 
+# =*= Set-up for TMUX =*=
+FOR_TMUX=$DOTDIR/for_tmux
+if [ -f $HOME/.tmux.conf ]; then
+	echo -n "TMUX: removing existing .tmux.conf ... "
+	rm $HOME/.tmux.conf
+	check_err
+fi
+echo -n "TMUX: linking new .tmux.conf ... "
+ln -sf $FOR_TMUX/.tmux.conf $HOME/.tmux.conf
+check_err
+
