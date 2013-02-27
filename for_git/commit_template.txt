@@ -1,0 +1,7 @@
+<50 char, imperative ("FIX", not "fixed"/"fixes")
+
+More detailed explanation, on WHAT HAPPENED. Wrap to 72 characters.
+Bullet-points ok (*/-, followed by single-space, separated by BLANK
+                  LINES).
+
+[ticket: X]
