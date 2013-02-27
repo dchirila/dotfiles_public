@@ -91,10 +91,16 @@ relink_to_home '.vimrc' $CONTEXT
 relink_to_home '.gvimrc' $CONTEXT
 # -> Pull submodules
 echo -n "$CONTEXT: Pulling Vundle ... "
+rm -rf $CONTEXT/.vim/vundle.git # remove dir if it already exists
 git clone https://github.com/gmarik/vundle.git $CONTEXT/.vim/vundle.git
 check_err; echo
 # -> Triggering BundleInstall (Vundle)
 echo -n "$CONTEXT: BundleInstall (Vundle) ... "
 vim +BundleInstall +qall
 check_err; echo
+
+# =*= Set-up for Pentadactyl (Firefox plugin) =*=
+CONTEXT="for_pentadactyl"
+# -> .pentadactylrc
+relink_to_home '.pentadactylrc' $CONTEXT
 
