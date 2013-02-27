@@ -28,7 +28,7 @@ cd $DOTDIR
 
 # =*= Set-up for GIT =*=
 FOR_GIT=$DOTDIR/for_git
-# - general settings
+# -> general settings
 echo -n "GIT: applying general settings ... "
 git config --global user.name "Dragos B. Chirila"
 git config --global user.email "dchirila@gmail.com"
@@ -56,5 +56,39 @@ if [ -f $HOME/.tmux.conf ]; then
 fi
 echo -n "TMUX: linking new .tmux.conf ... "
 ln -sf $FOR_TMUX/.tmux.conf $HOME/.tmux.conf
+check_err
+
+# =*= Set-up for VIM =*=
+FOR_VIM=$DOTDIR/for_vim
+# -> .vim/-dir
+if [ -d $HOME/.vim ]; then
+	echo -n "VIM: removing existing .vim-folder ... "
+	rm -rf $HOME/.vim
+	check_err
+fi
+echo -n "VIM: linking new .vim-folder ... "
+ln -sf $FOR_VIM/.vim $HOME/.vim
+check_err
+# -> .vimrc
+if [ -f $HOME/.vimrc ]; then
+	echo -n "VIM: removing existing .vimrc ... "
+	rm $HOME/.vimrc
+	check_err
+fi
+echo -n "VIM: linking new .vimrc ... "
+ln -sf $FOR_VIM/.vim/.vimrc $HOME/.vimrc
+check_err
+# -> .gvimrc
+if [ -f $HOME/.gvimrc ]; then
+	echo -n "VIM: removing existing .gvimrc ... "
+	rm $HOME/.vimrc
+	check_err
+fi
+echo -n "VIM: linking new .gvimrc ... "
+ln -sf $FOR_VIM/.vim/.gvimrc $HOME/.gvimrc
+check_err
+# -> Triggering BundleInstall (Vundle)
+echo -n "VIM: BundleInstall (Vundle) ... "
+vim +BundleInstall +qall
 check_err
 

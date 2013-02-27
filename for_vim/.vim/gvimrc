@@ -1,0 +1,34 @@
+"__________________________________"
+" START: GUI-Vim-specific settings "
+"----------------------------------"
+    " Choose a font for the GUI.
+    set guifont=Consolas\ 10
+
+    " START: Customize GUI scroolbars
+        " Disable left scroolbar
+        set go-=l
+        " Disable right-scroolbar
+        set go-=r
+        " KEEP bottom-bar, s.t. we can resize windows
+        set go+=b
+    " END: Customize GUI scroolbars
+
+    " START: Disable the GUI by default
+        set guioptions-=m
+        set guioptions-=T
+    " END: Disable the GUI by default
+
+    " START: Make GUI visible ON-DEMAND (when F2 key is pressed)
+        map <silent> <F2> :if &guioptions =~# 'T' <Bar>
+        \set guioptions-=T <Bar>
+        \set guioptions-=m <bar>
+        \else <Bar>
+        \set guioptions+=T <Bar>
+        \set guioptions+=m <Bar>
+        \endif<CR>
+    " END: Make GUI visible ON-DEMAND (when F2 key is pressed)
+
+"________________________________"
+" END: GUI-Vim-specific settings "
+"--------------------------------"
+

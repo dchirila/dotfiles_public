@@ -1,2 +1,4 @@
-for_git/gitignore
-for_vim/dot_vim_folder/view/
+# Automatically-generated/fetched files for my config.
+for_vim/.vim/bundle
+for_vim/.vim/tags
+for_vim/.vim/view
