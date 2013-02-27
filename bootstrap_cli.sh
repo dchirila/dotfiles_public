@@ -4,15 +4,41 @@
 #!/bin/bash
 
 # Function to simplify error-reporting.
+# Args: None
 # NOTE: Call this after each "milestone"!
 function check_err
 {
-	if [ $? -gt 0 ]; then
-		echo "FAIL!"
-		exit 1
-	else
-		echo "OK"
-	fi
+  if [ $? -gt 0 ]; then
+    echo "FAIL!"
+    exit 1
+  else
+    echo "OK"
+  fi
+}
+
+# Function to delete and (re)link files and folders to
+# $HOME-folder.
+# Args: $1 = directory/file-name
+#       $1 = $CONTEXT (i.e. 'for_vim', 'for_git', etc.)
+function relink_to_home
+{
+  DESTINATION=$HOME'/'$1
+  SOURCE=$(pwd)/$2/$1
+
+  # Stage 1: Cleanup
+  if [[ -d $DESTINATION ]]; then
+    echo -n "$2: removing existing FOLDER $DESTINATION ... "
+    rm -rf $DESTINATION
+    check_err
+  elif [[ -f $DESTINATION ]]; then
+    echo -n "$2: removing existing FILE $DESTINATION ... "
+    rm -rf $DESTINATION
+    check_err
+  fi
+  # Stage 2: Re-link
+  echo -n "$2: (re)linking $SOURCE -> $DESTINATION ... "
+  ln -sf $SOURCE $DESTINATION
+  check_err; echo
 }
 
 # =*= Global Variables for bootstrap_cli.sh-script =*=
@@ -27,9 +53,9 @@ echo "Script is in folder: $DOTDIR"
 cd $DOTDIR
 
 # =*= Set-up for GIT =*=
-FOR_GIT=$DOTDIR/for_git
+CONTEXT="for_git"
 # -> general settings
-echo -n "GIT: applying general settings ... "
+echo -n "$CONTEXT: applying general settings ... "
 git config --global user.name "Dragos B. Chirila"
 git config --global user.email "dchirila@gmail.com"
 git config --global core.editor vim
@@ -39,56 +65,32 @@ git config --global alias.unstage "reset HEAD"
 #    (Windows users should set "core.autocrlf true")
 git config --global core.autocrlf input
 # -> commit-message template
-git config --global commit.template $FOR_GIT/commit_template.txt
-check_err
+git config --global commit.template $CONTEXT/commit_template.txt
+check_err; echo
 # -> ignored-files
 #    (A) This version uses file defined by me
-git config --global core.excludesfile $FOR_GIT/my_gitignore_global
+git config --global core.excludesfile $CONTEXT/my_gitignore_global
 #    (B) This version uses files defined in the community GitHub-repo
 URL_GITIGNORES=https://github.com/github/gitignore.git
+# -> gitk
+relink_to_home '.gitk' $CONTEXT
 
-# =*= Set-up for TMUX =*=
-FOR_TMUX=$DOTDIR/for_tmux
-if [ -f $HOME/.tmux.conf ]; then
-	echo -n "TMUX: removing existing .tmux.conf ... "
-	rm $HOME/.tmux.conf
-	check_err
-fi
-echo -n "TMUX: linking new .tmux.conf ... "
-ln -sf $FOR_TMUX/.tmux.conf $HOME/.tmux.conf
-check_err
+
+## =*= Set-up for TMUX =*=
+CONTEXT="for_tmux"
+# -> .tmux.conf
+relink_to_home '.tmux.conf' $CONTEXT
 
 # =*= Set-up for VIM =*=
-FOR_VIM=$DOTDIR/for_vim
+CONTEXT="for_vim"
 # -> .vim/-dir
-if [ -d $HOME/.vim ]; then
-	echo -n "VIM: removing existing .vim-folder ... "
-	rm -rf $HOME/.vim
-	check_err
-fi
-echo -n "VIM: linking new .vim-folder ... "
-ln -sf $FOR_VIM/.vim $HOME/.vim
-check_err
+relink_to_home '.vim' $CONTEXT
 # -> .vimrc
-if [ -f $HOME/.vimrc ]; then
-	echo -n "VIM: removing existing .vimrc ... "
-	rm $HOME/.vimrc
-	check_err
-fi
-echo -n "VIM: linking new .vimrc ... "
-ln -sf $FOR_VIM/.vim/.vimrc $HOME/.vimrc
-check_err
+relink_to_home '.vimrc' $CONTEXT
 # -> .gvimrc
-if [ -f $HOME/.gvimrc ]; then
-	echo -n "VIM: removing existing .gvimrc ... "
-	rm $HOME/.vimrc
-	check_err
-fi
-echo -n "VIM: linking new .gvimrc ... "
-ln -sf $FOR_VIM/.vim/.gvimrc $HOME/.gvimrc
-check_err
+relink_to_home '.gvimrc' $CONTEXT
 # -> Triggering BundleInstall (Vundle)
-echo -n "VIM: BundleInstall (Vundle) ... "
+echo -n "$CONTEXT: BundleInstall (Vundle) ... "
 vim +BundleInstall +qall
-check_err
+check_err; echo
 
