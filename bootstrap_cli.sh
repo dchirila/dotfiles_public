@@ -104,3 +104,8 @@ CONTEXT="for_pentadactyl"
 # -> .pentadactylrc
 relink_to_home '.pentadactylrc' $CONTEXT
 
+# =*= Set-up for my_cloc (estimates for lines of code) =*=
+CONTEXT="for_my_cloc"
+# -> my_cloc_language_definitions.txt
+relink_to_home 'my_cloc_language_definitions.txt' $CONTEXT
+
