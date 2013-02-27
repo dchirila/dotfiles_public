@@ -89,6 +89,10 @@ relink_to_home '.vim' $CONTEXT
 relink_to_home '.vimrc' $CONTEXT
 # -> .gvimrc
 relink_to_home '.gvimrc' $CONTEXT
+# -> Pull submodules
+echo -n "$CONTEXT: Pulling Vundle ... "
+git clone git@github.com:gmarik/vundle.git $CONTEXT/.vim/vundle.git
+check_err; echo
 # -> Triggering BundleInstall (Vundle)
 echo -n "$CONTEXT: BundleInstall (Vundle) ... "
 vim +BundleInstall +qall
