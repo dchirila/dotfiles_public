@@ -76,7 +76,7 @@ URL_GITIGNORES=https://github.com/github/gitignore.git
 relink_to_home '.gitk' $CONTEXT
 
 
-## =*= Set-up for TMUX =*=
+# =*= Set-up for TMUX =*=
 CONTEXT="for_tmux"
 # -> .tmux.conf
 relink_to_home '.tmux.conf' $CONTEXT
@@ -108,4 +108,9 @@ relink_to_home '.pentadactylrc' $CONTEXT
 CONTEXT="for_my_cloc"
 # -> my_cloc_language_definitions.txt
 relink_to_home 'my_cloc_language_definitions.txt' $CONTEXT
+
+# =*= Set-up for readline =*=
+CONTEXT="for_readline"
+# -> .inputrc
+relink_to_home '.inputrc' $CONTEXT
 
