@@ -18,9 +18,9 @@ function check_err
 
 # Function to delete and (re)link files and folders to
 # $HOME-folder.
-# Args: $1 = directory/file-name
-#       $1 = $CONTEXT (i.e. 'for_vim', 'for_git', etc.)
-function relink_to_home
+# Args: $1 = folder/file-name
+#       $2 = $CONTEXT (i.e. 'for_vim', 'for_git', etc.)
+function relink_in_home
 {
   DESTINATION=$HOME'/'$1
   SOURCE=$(pwd)/$2/$1
@@ -40,6 +40,48 @@ function relink_to_home
   ln -sf $SOURCE $DESTINATION
   check_err; echo
 }
+
+# Function to delete and (re)link files and folders to
+# a custom target folder.
+# Args: $1 = folder/file-name
+#       $2 = $CONTEXT (i.e. 'for_vim', 'for_git', etc.)
+#       $3 = host folder, inside which to relink.
+function relink_in_folder
+{
+  HOST_FOLDER=$3
+  DESTINATION=$3'/'$1 # may be file OR folder
+  SOURCE=$(pwd)/$2/$1
+
+  # Sanity-check: HOST_FOLDER should either be a valid FOLDER
+  #               (pre-existing, or to be created).
+  #               It should NOT be a FILE!
+  echo -n "$2: Checking that $3 really is a valid FOLDER-name ... "
+  [[ -d $3 ]] || [[ ! -f $3 ]]
+  check_err
+
+  # Preparation: Create HOST_FOLDER if it doesn't exist.
+  if [[ ! -d $3 ]]; then
+    echo -n "$2: Creating FOLDER $3 anew ... "
+    mkdir $3
+    check_err
+  fi
+
+  # Stage 1: Cleanup
+  if [[ -d $DESTINATION ]]; then
+    echo -n "$2: removing existing FOLDER $DESTINATION ... "
+    rm -rf $DESTINATION
+    check_err
+  elif [[ -f $DESTINATION ]]; then
+    echo -n "$2: removing existing FILE $DESTINATION ... "
+    rm -rf $DESTINATION
+    check_err
+  fi
+  # Stage 2: Re-link
+  echo -n "$2: (re)linking $SOURCE -> $DESTINATION ... "
+  ln -sf $SOURCE $DESTINATION
+  check_err; echo
+}
+
 
 # =*= Global Variables for bootstrap_cli.sh-script =*=
 VOID='/dev/null'
@@ -73,27 +115,28 @@ git config --global core.excludesfile $CONTEXT/my_gitignore_global
 #    (B) This version uses files defined in the community GitHub-repo
 URL_GITIGNORES=https://github.com/github/gitignore.git
 # -> gitk
-relink_to_home '.gitk' $CONTEXT
+relink_in_home '.gitk' $CONTEXT
 
 
 # =*= Set-up for TMUX =*=
 CONTEXT="for_tmux"
 # -> .tmux.conf
-relink_to_home '.tmux.conf' $CONTEXT
+relink_in_home '.tmux.conf' $CONTEXT
 
 # =*= Set-up for VIM =*=
 CONTEXT="for_vim"
 # -> .vim/-dir
-relink_to_home '.vim' $CONTEXT
+relink_in_home '.vim' $CONTEXT
 # -> .vimrc
-relink_to_home '.vimrc' $CONTEXT
+relink_in_home '.vimrc' $CONTEXT
 # -> .gvimrc
-relink_to_home '.gvimrc' $CONTEXT
-# -> Pull submodules
-echo -n "$CONTEXT: Pulling Vundle ... "
-rm -rf $CONTEXT/.vim/vundle.git # remove dir if it already exists
-git clone https://github.com/gmarik/vundle.git $CONTEXT/.vim/vundle.git
-check_err; echo
+relink_in_home '.gvimrc' $CONTEXT
+# -> .vim/vundle.git
+if [[ ! -d $CONTEXT/.vim/vundle.git ]]; then
+  echo -n "$CONTEXT: Pulling Vundle ... "
+  git clone https://github.com/gmarik/vundle.git $CONTEXT/.vim/vundle.git
+  check_err; echo
+fi
 # -> Triggering BundleInstall (Vundle)
 echo -n "$CONTEXT: BundleInstall (Vundle) ... "
 vim +BundleInstall +qall
@@ -102,15 +145,23 @@ check_err; echo
 # =*= Set-up for Pentadactyl (Firefox plugin) =*=
 CONTEXT="for_pentadactyl"
 # -> .pentadactylrc
-relink_to_home '.pentadactylrc' $CONTEXT
+relink_in_home '.pentadactylrc' $CONTEXT
 
 # =*= Set-up for my_cloc (estimates for lines of code) =*=
 CONTEXT="for_my_cloc"
 # -> my_cloc_language_definitions.txt
-relink_to_home 'my_cloc_language_definitions.txt' $CONTEXT
+relink_in_home 'my_cloc_language_definitions.txt' $CONTEXT
 
 # =*= Set-up for readline =*=
 CONTEXT="for_readline"
 # -> .inputrc
-relink_to_home '.inputrc' $CONTEXT
+relink_in_home '.inputrc' $CONTEXT
 
+# =*= Set-up for XMonad =*=
+CONTEXT="for_xmonad"
+# -> xmonad.hs
+# NOTE: Since we don't want to pull the files from under a running
+#       XMonad-session, we do not reset the entire ~/.xmonad-folder.
+#       Instead, we only re-create that folder if it doesn't exist already,
+#       and only reset the xmonad.hs-file itself.
+relink_in_folder 'xmonad.hs' $CONTEXT $HOME/.xmonad
