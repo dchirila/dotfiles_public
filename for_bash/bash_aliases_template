@@ -1,0 +1,19 @@
+alias ff="git status"
+alias gstat="git status"
+
+alias gadd="git add"
+alias grm="git rm"
+alias gdiff="git diff"
+alias fd="git diff"
+
+alias agrep="ack-grep"
+
+# MACROS to be replaced by the actual paths
+# (this is done by the bootstrap-script)
+alias mycloc="MACRO_CLOC_PATH --read-lang-def=MACRO_CLOC_DEFN_PATH ."
+
+# let TMux know that it can use 256 colors
+alias tmux="export MUX='tmux'; TERM=screen-256color-bce tmux"
+alias tat="tmux attach -t"
+alias tls="tmux ls"
+

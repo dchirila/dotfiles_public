@@ -23,7 +23,7 @@ function check_err
 function relink_in_home
 {
   DESTINATION=$HOME'/'$1
-  SOURCE=$(pwd)/$2/$1
+  SOURCE=$(pwd -P)/$2/$1
 
   # Stage 1: Cleanup
   if [[ -d $DESTINATION ]]; then
@@ -50,7 +50,7 @@ function relink_in_folder
 {
   HOST_FOLDER=$3
   DESTINATION=$3'/'$1 # may be file OR folder
-  SOURCE=$(pwd)/$2/$1
+  SOURCE=$(pwd -P)/$2/$1
 
   # Sanity-check: HOST_FOLDER should either be a valid FOLDER
   #               (pre-existing, or to be created).
@@ -84,10 +84,9 @@ function relink_in_folder
 
 
 # =*= Global Variables for bootstrap_cli.sh-script =*=
-VOID='/dev/null'
 # -> Get the path to the script (so that we know where the sub-dirs are)
-pushd `dirname $0` > /dev/null
-DOTDIR=`pwd -P`
+pushd $(dirname $0) > /dev/null
+DOTDIR=$(pwd -P)
 popd > /dev/null
 echo "Script is in folder: $DOTDIR"
 
@@ -149,8 +148,15 @@ relink_in_home '.pentadactylrc' $CONTEXT
 
 # =*= Set-up for my_cloc (estimates for lines of code) =*=
 CONTEXT="for_my_cloc"
-# -> my_cloc_language_definitions.txt
-relink_in_home 'my_cloc_language_definitions.txt' $CONTEXT
+# -> Get the latest version of 'cloc' itself
+echo -n "$CONTEXT: Getting latest release of 'cloc'-script ... "
+wget 'http://sourceforge.net/projects/cloc/files/latest/download?source=files' \
+  -O $CONTEXT/cloc &> /dev/null
+check_err; echo
+chmod +x $CONTEXT/cloc
+# -> STORE PATHS for later (to construct a BASH-alias)
+MY_CLOC_PATH=$DOTDIR/$CONTEXT/cloc
+MY_CLOC_DEF_PATH=$DOTDIR/$CONTEXT/my_cloc_language_definitions.txt
 
 # =*= Set-up for readline =*=
 CONTEXT="for_readline"
@@ -165,3 +171,12 @@ CONTEXT="for_xmonad"
 #       Instead, we only re-create that folder if it doesn't exist already,
 #       and only reset the xmonad.hs-file itself.
 relink_in_folder 'xmonad.hs' $CONTEXT $HOME/.xmonad
+
+# =*= Set-up for BASH =*=
+CONTEXT="for_bash"
+# -> Generate 'bash_aliases' (from 'bash_aliases_template')
+cat $CONTEXT/bash_aliases_template | \
+  sed "s|MACRO_CLOC_DEFN_PATH|$MY_CLOC_DEF_PATH|" | \
+  sed "s|MACRO_CLOC_PATH|$MY_CLOC_PATH|" > \
+  $CONTEXT/bash_aliases
+

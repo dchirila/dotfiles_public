@@ -3,3 +3,7 @@ for_vim/.vim/bundle
 for_vim/.vim/tags
 for_vim/.vim/view
 for_vim/.vim/vundle.git/
+# auto-generated from 'bash_aliases_template'
+
+for_bash/bash_aliases
+for_my_cloc/cloc
