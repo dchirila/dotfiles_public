@@ -106,7 +106,7 @@ git config --global alias.unstage "reset HEAD"
 #    (Windows users should set "core.autocrlf true")
 git config --global core.autocrlf input
 # -> commit-message template
-git config --global commit.template $CONTEXT/commit_template.txt
+git config --global commit.template $DOTDIR/$CONTEXT/commit_template.txt
 check_err; echo
 # -> ignored-files
 #    (A) This version uses file defined by me
