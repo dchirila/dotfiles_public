@@ -490,6 +490,10 @@ endif
     " END: NERD Tree Plugin Settings
 
     " START: Vim-Latex
+        " Disable FOLDING for TeX-files
+        let Tex_FoldedSections=""
+        let Tex_FoldedEnvironments=""
+        let Tex_FoldedMisc=""
         " IMPORTANT: grep will sometimes skip displaying the file name if you
         " search in a singe file. This will confuse Latex-Suite. Set your grep
         " program to always generate a file-name.
